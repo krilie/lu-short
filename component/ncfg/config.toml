@@ -1,0 +1,39 @@
+[ali_sms]
+key = "key"
+secret = "secret"
+
+[db]
+conn_max_left_time = 14400
+conn_str = "root:123456@tcp(localhost:3306)/myapp_test?charset=utf8mb4&parseTime=True&loc=Asia%2FShanghai"
+max_idle_conn = 10
+max_open_conn = 5
+
+[email]
+address = "who@example.com"
+host = "smtpdm.example.com"
+password = "password"
+port = 465
+user_name = "who@example.com"
+
+[file_save]
+channel = "qiniu"
+oss_bucket = "common"
+oss_end_point = "http://example.com"
+oss_key = "oss_key"
+oss_secret = "oss_secret"
+
+[http]
+enable_swagger = false
+gin_mode = "debug"
+port = 80
+ssl_pri = ""
+ssl_pub = ""
+url = "http://localhost"
+
+[jwt]
+hs_256_key = "wDcd3LZl*3L$gmsDd#qSXZ2eMPcM#ps^sWWrt5*&$^Tpg2PIDGoh76hEWVWkCv%cSi%aZXnyXJYC#WxWhuMBp"
+normal_exp_duration = 604800
+
+[log]
+log_file = ""
+log_level = 5
