@@ -106,7 +106,7 @@ func Test2(t *testing.T) {
 	println(ok)
 }
 
-//go:generate go test -v ./... -args config_path=a/b/c
+//go:generate go test -v ./... -args config_path=F:\\新建文件夹\\config.toml
 func TestNewNDb(t *testing.T) {
 	dig := appdig.NewAppDig()
 	dig.MustProvide(ncfg.NewNConfig)
