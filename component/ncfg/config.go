@@ -1,7 +1,6 @@
 package ncfg
 
 import (
-	"flag"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
@@ -42,14 +41,19 @@ func NewNConfig() *NConfig {
 		println("warn:环境变量配置内容 未能加载" + err.Error())
 	}
 	// 配置位置 --config_path
-	set := flag.NewFlagSet("cfg", flag.ExitOnError)
-	var configPath = set.String("config_path", "", "配置文件位置")
-	err = set.Parse(os.Args[1:])
-	if err != nil {
-		panic(err)
-	}
-	if configPath != nil && *configPath != "" {
-		err = cfg.LoadConfigByFile(*configPath)
+	configPath := func() string {
+		for _, value := range os.Args[1:] {
+			if strings.HasPrefix(value, "config_path") ||
+				strings.HasPrefix(value, "-config_path") ||
+				strings.HasPrefix(value, "--config_path") {
+				split := strings.Split(value, "=")
+				return split[1]
+			}
+		}
+		return ""
+	}()
+	if configPath != "" {
+		err = cfg.LoadConfigByFile(configPath)
 		if err != nil {
 			println("warn:命令行配置文件位置 未能加载" + err.Error())
 		}

@@ -1,5 +1,7 @@
 package com_model
 
+import "time"
+
 // PaginationParam 分页查询条件
 // @Param page_num query int true "page_num页索引"
 // @Param page_size query int true "page_size页大小"
@@ -67,4 +69,11 @@ func NewPageData2(pageInfo *PageInfo, data interface{}) *PageData {
 		PageInfo: *pageInfo,
 		Data:     data,
 	}
+}
+
+type TbCommon struct {
+	Id        string     `json:"id" db:"id"` // id
+	CreatedAt time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at" db:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at" db:"deleted_at"`
 }

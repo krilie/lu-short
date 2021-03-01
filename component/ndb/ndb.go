@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"lu-short/component/dbmigrate"
+	"lu-short/component/ncfg"
 	"strings"
 	"sync"
 	"time"
@@ -49,15 +50,15 @@ type NDb struct {
 	sqlxDb      IDb // *sqlx.DB
 }
 
-func NewNDb(
-	MaxOpenConn int, MaxIdleConn int,
-	ConnMaxLeftTime int, ConnStr string,
-) *NDb {
+func NewNDb(cfg *ncfg.NConfig) *NDb {
+
+	dbCfg := cfg.GetDbCfg()
+
 	db := &NDb{}
-	db.cfg.ConnStr = ConnStr
-	db.cfg.ConnMaxLeftTime = ConnMaxLeftTime
-	db.cfg.MaxIdleConn = MaxIdleConn
-	db.cfg.MaxOpenConn = MaxOpenConn
+	db.cfg.ConnStr = dbCfg.ConnStr
+	db.cfg.ConnMaxLeftTime = dbCfg.ConnMaxLeftTime
+	db.cfg.MaxIdleConn = dbCfg.MaxIdleConn
+	db.cfg.MaxOpenConn = dbCfg.MaxOpenConn
 	db.Start()
 	return db
 }
@@ -105,6 +106,22 @@ func (ndb *NDb) GetDb(ctx context.Context) IDb {
 		return txDb
 	}
 	return ndb.sqlxDb
+}
+
+func (ndb *NDb) Exec(ctx context.Context, sql string, args ...interface{}) (rowsAffected int64, err error) {
+	execContext, err := ndb.GetDb(ctx).ExecContext(ctx, sql, args...)
+	if err != nil {
+		return 0, err
+	}
+	return execContext.RowsAffected()
+}
+
+func (ndb *NDb) Get(ctx context.Context, data interface{}, sql string, args ...interface{}) error {
+	return sqlx.Get(ndb.GetDb(ctx), data, sql, args...)
+}
+
+func (ndb *NDb) Select(ctx context.Context, data interface{}, sql string, args ...interface{}) error {
+	return sqlx.Select(ndb.GetDb(ctx), data, sql, args...)
 }
 
 // GetGlobalDb get db before use

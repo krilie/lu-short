@@ -5,13 +5,13 @@ import (
 	"lu-short/component/nlog"
 )
 
-type LuShortDao struct {
+type VisitorInfoDao struct {
 	dao *ndb.NDb
 	log *nlog.NLog
 }
 
-func NewLuShortDao(dao *ndb.NDb, log *nlog.NLog) *LuShortDao {
-	return &LuShortDao{
+func NewVisitorInfoDao(dao *ndb.NDb, log *nlog.NLog) *VisitorInfoDao {
+	return &VisitorInfoDao{
 		dao: dao,
 		log: log,
 	}

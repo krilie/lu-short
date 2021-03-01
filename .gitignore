@@ -4,3 +4,4 @@ app.exe
 app
 
 .cache/
+**.exe

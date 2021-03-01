@@ -1,6 +1,11 @@
 package ndb
 
-import "testing"
+import (
+	"lu-short/common/appdig"
+	"lu-short/component/ncfg"
+	"lu-short/component/nlog"
+	"testing"
+)
 
 type I interface {
 	Hello()
@@ -99,4 +104,16 @@ func Test2(t *testing.T) {
 	b.Hello2()
 	_, ok := a.(*one)
 	println(ok)
+}
+
+//go:generate go test -v ./... -args config_path=a/b/c
+func TestNewNDb(t *testing.T) {
+	dig := appdig.NewAppDig()
+	dig.MustProvide(ncfg.NewNConfig)
+	dig.MustProvide(NewNDb)
+	dig.MustProvide(nlog.NewNLog)
+
+	dig.MustInvoke(func(ndb *NDb) {
+		ndb.Ping()
+	})
 }
