@@ -9,18 +9,10 @@ import (
 	"lu-short/component/nlog"
 )
 
+// 生产环境 开发环境&测试环境 通过配置文件区分
 var DigComponentProviderAll = []interface{}{
-	ncfg.NewNConfigByFileFromEnv("APP_CONFIG_PATH"),
-	nlog.NewLogger,
-	ndb.NewNDb,
-	broker.NewBroker,
-	cache.NewCache,
-	cron.NewCrone,
-}
-
-var DigComponentProviderAllForTest = []interface{}{
-	ncfg.NewNConfigByCfgStrFromEnvJson("MYAPP_TEST_CONFIG"),
-	nlog.NewLogger,
+	ncfg.NewNConfig,
+	nlog.NewNLog,
 	ndb.NewNDb,
 	broker.NewBroker,
 	cache.NewCache,

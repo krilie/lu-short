@@ -1,4 +1,4 @@
-package nlog2
+package nlog
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"lu-short/common/run_env"
 	"testing"
+	"time"
 )
 
 // zap log
@@ -14,8 +15,8 @@ import (
 func TestZapLog2(t *testing.T) {
 
 	logFile := &lumberjack.Logger{
-		Filename:   fmt.Sprintf("log-%s.log", run_env.GetHostName()), //filePath
-		MaxSize:    1,                                                // megabytes
+		Filename:   fmt.Sprintf("log/log-%s.log", run_env.GetHostName()), //filePath
+		MaxSize:    1,                                                    // megabytes
 		MaxBackups: 4,
 		MaxAge:     1,     //days
 		Compress:   false, // disabled by default
@@ -39,5 +40,6 @@ func TestZapLog2(t *testing.T) {
 	log := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 	for i := 0; i < 1000000; i++ {
 		log.Info("test for test")
+		time.Sleep(time.Second)
 	}
 }

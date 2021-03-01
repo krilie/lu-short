@@ -1,6 +1,7 @@
 package ncfg
 
 import (
+	"flag"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
@@ -23,7 +24,62 @@ func NewNConfig() *NConfig {
 	replacer := strings.NewReplacer(".", "_")
 	cfg.V.SetEnvKeyReplacer(replacer)
 
+	// 命令行位置 > 环境变量位置 > 环境变量配置 > 默认位置
+
+	// 默认位置的配置文件
+	err := cfg.LoadConfigByFile("config.toml")
+	if err != nil {
+		println("warn:默认位置 未能加载 " + err.Error())
+	}
+	// 默认环境变量位置
+	err = cfg.LoadConfigByFile(os.Getenv("LUSHORT_CFG_PATH"))
+	if err != nil {
+		println("warn:环境变量位置 未能加载" + err.Error())
+	}
+	// 默认环境变量内容
+	err = cfg.LoadFromConfigJsonStr(os.Getenv("LUSHORT_CFG_CONTENT"))
+	if err != nil {
+		println("warn:环境变量配置内容 未能加载" + err.Error())
+	}
+	// 配置位置 --config_path
+	set := flag.NewFlagSet("cfg", flag.ExitOnError)
+	var configPath = set.String("config_path", "", "配置文件位置")
+	err = set.Parse(os.Args[1:])
+	if err != nil {
+		panic(err)
+	}
+	if configPath != nil && *configPath != "" {
+		err = cfg.LoadConfigByFile(*configPath)
+		if err != nil {
+			println("warn:命令行配置文件位置 未能加载" + err.Error())
+		}
+	} else {
+		println("warn:命令行配置文件位置 未能加载")
+	}
+
 	return cfg
+}
+
+func NewNConfigFromTomlFilePathEnv(cfgPathEnvName string) func() *NConfig {
+	return func() *NConfig {
+		var cfg = NewNConfig()
+		err := cfg.LoadConfigByFile(os.Getenv(cfgPathEnvName))
+		if err != nil {
+			panic(err)
+		}
+		return cfg
+	}
+}
+
+func NewNConfigFromFilePathJsonContent(cfgContentEnvName string) func() *NConfig {
+	return func() *NConfig {
+		var cfg = NewNConfig()
+		err := cfg.LoadFromConfigJsonStr(os.Getenv(cfgContentEnvName))
+		if err != nil {
+			panic(err)
+		}
+		return cfg
+	}
 }
 
 func (cfg *NConfig) LoadConfigByFile(name string) error {
