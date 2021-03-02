@@ -12,6 +12,7 @@ func TestAutoFunc(t *testing.T) {
 	count := 0
 	// register smq
 	err := Smq.Register(context.Background(), func(i *messages.TestMessage) {
+		println(i.Test)
 		count++
 		assert.Equal(t, "for test test", i.Test, "should equal")
 	})

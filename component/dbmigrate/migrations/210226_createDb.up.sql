@@ -1,3 +1,4 @@
+#==========================manage=====================================
 CREATE TABLE `tb_manage`
 (
     `id`         char(36)     NOT NULL primary key,
@@ -16,8 +17,9 @@ CREATE TABLE `tb_manage`
     index `idx_created_at` (`created_at`) using btree
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+#========================================================================
 
-
+#==========================visitor======================================
 CREATE TABLE `tb_visitor`
 (
     `id`              char(36)    NOT NULL primary key,
@@ -33,7 +35,9 @@ CREATE TABLE `tb_visitor`
     index `idx_created_at` (`created_at`) using btree
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+#======================================================================
 
+#=============lu-short==========redirect=======================================
 CREATE TABLE `tb_redirect`
 (
     `id`          char(36)    NOT NULL primary key,
@@ -53,8 +57,6 @@ CREATE TABLE `tb_redirect`
     index `idx_created_at` (`created_at`) using btree
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
-
-
 
 CREATE TABLE `tb_redirect_log`
 (
@@ -82,7 +84,9 @@ CREATE TABLE `tb_redirect_log`
     index `idx_ori_url` (`ori_url`) using hash
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+#========================================================================
 
+# =======================================customer========================
 CREATE TABLE `tb_customer`
 (
     `id`         char(36)     NOT NULL primary key,
@@ -102,3 +106,4 @@ CREATE TABLE `tb_customer`
     index `idx_created_at` (`created_at`) using btree
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+#=======================================================================
