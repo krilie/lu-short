@@ -25,3 +25,16 @@ func (broker *Broker) MustRegister(ctx context.Context, f interface{}) {
 		panic(err)
 	}
 }
+
+func MustSend(ctx context.Context, broker *go_smq.Broker, msg go_smq.Message) {
+	err := broker.Send(ctx, msg)
+	if err != nil {
+		panic(err)
+	}
+}
+func MustRegister(ctx context.Context, broker *go_smq.Broker, f interface{}) {
+	err := broker.Register(ctx, f)
+	if err != nil {
+		panic(err)
+	}
+}
