@@ -72,5 +72,8 @@ func (dao *LuShortDao) UpdateReDirect(ctx context.Context, m *model.TbRedirect) 
 
 func (dao *LuShortDao) DeleteLuShort(ctx context.Context, id string) error {
 	_, err := dao.dao.Exec(ctx, "update table tb_redirect set deleted_at=? where id=?", time.Now(), id)
+	if err == nil {
+		dao.directCatch.Remove(id)
+	}
 	return err
 }
