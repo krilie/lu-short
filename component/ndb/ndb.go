@@ -190,11 +190,11 @@ func (ndb *NDb) MigrationDb() {
 			panic(err)
 		}
 	}()
-	// 数据库迁移 ?charset=utf8mb4&parseTime=True&loc=Asia%2FShanghai&multiStatements=true
+	// 数据库迁移 ?charset=utf8mb4&parseTime=True&loc=Asia%2FShanghai
 	// multiStatements=true
 	var dbName = GetDbNameFromConnectStr(ndb.cfg.ConnStr)
 	var connectStrForMigration = strings.Replace(ndb.cfg.ConnStr, dbName, "", 1)
-	migrationDb, err := sql.Open("mysql", connectStrForMigration)
+	migrationDb, err := sql.Open("mysql", connectStrForMigration+"&multiStatements=true")
 	if err != nil {
 		panic(err)
 	}
