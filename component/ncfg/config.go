@@ -29,16 +29,22 @@ func NewNConfig() *NConfig {
 	err := cfg.LoadConfigByFile("config.toml")
 	if err != nil {
 		println("warn:默认位置 未能加载 " + err.Error())
+	} else {
+		println("info:成功加载 默认位置")
 	}
 	// 默认环境变量位置
 	err = cfg.LoadConfigByFile(os.Getenv("LUSHORT_CFG_PATH"))
 	if err != nil {
 		println("warn:环境变量位置 未能加载" + err.Error())
+	} else {
+		println("info:成功加载 环境变量配置文件位置")
 	}
 	// 默认环境变量内容
 	err = cfg.LoadFromConfigJsonStr(os.Getenv("LUSHORT_CFG_CONTENT"))
 	if err != nil {
 		println("warn:环境变量配置内容 未能加载" + err.Error())
+	} else {
+		println("info:成功加载环境变量配置内容")
 	}
 	// 配置位置 --config_path
 	configPath := func() string {
@@ -56,6 +62,8 @@ func NewNConfig() *NConfig {
 		err = cfg.LoadConfigByFile(configPath)
 		if err != nil {
 			println("warn:命令行配置文件位置 未能加载" + err.Error())
+		} else {
+			println("info:成功从命令行加载配置文件位置")
 		}
 	} else {
 		println("warn:命令行配置文件位置 未能加载")

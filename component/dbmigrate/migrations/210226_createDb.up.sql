@@ -1,20 +1,17 @@
-SET FOREIGN_KEY_CHECKS = 0;
-
-CREATE TABLE `tb_user_master`
+CREATE TABLE `tb_article_master`
 (
-    `id`         char(36)     NOT NULL primary key,
-    `created_at` datetime(3)  NOT NULL,
-    `updated_at` datetime(3)  NOT NULL,
-    `deleted_at` datetime(3) DEFAULT NULL,
-    `login_name` varchar(50)  NOT NULL,
-    `phone_num`  varchar(20)  NOT NULL,
-    `email`      varchar(100) NOT NULL,
-    `password`   varchar(64)  NOT NULL,
-    `picture`    varchar(500) NOT NULL,
-    `salt`       varchar(8)   NOT NULL,
-    INDEX `idx_phone_num` (`phone_num`) USING HASH,
-    index `idx_deleted_at` (`deleted_at`) using btree,
-    index `idx_updated_at` (`updated_at`) using btree,
-    index `idx_created_at` (`created_at`) using btree
+    `id`          char(36)     NOT NULL,
+    `created_at`  datetime(3)  NOT NULL,
+    `updated_at`  datetime(3)  NOT NULL,
+    `deleted_at`  datetime(3) DEFAULT NULL,
+    `title`       varchar(256) NOT NULL,
+    `description` varchar(512) NOT NULL,
+    `content`     text         NOT NULL,
+    `picture`     varchar(512) NOT NULL,
+    `sort`        int(11)      NOT NULL,
+    `pv`          int(11)      NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_tb_article_master_deleted_at` (`deleted_at`),
+    KEY `idx_tb_article_master_sort` (`sort`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;

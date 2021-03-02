@@ -4,7 +4,7 @@ secret = "secret"
 
 [db]
 conn_max_left_time = 14400
-conn_str = "root:123456@tcp(localhost:3306)/myapp_test?charset=utf8mb4&parseTime=True&loc=Asia%2FShanghai"
+conn_str = "test:123456@tcp(localhost:3306)/myapp_test?charset=utf8mb4&parseTime=True&loc=Asia%2FShanghai"
 max_idle_conn = 10
 max_open_conn = 5
 
