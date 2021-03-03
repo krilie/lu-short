@@ -1,9 +1,14 @@
 package dao
 
 import (
+	"context"
+	"github.com/stretchr/testify/require"
 	"lu-short/common/appdig"
+	"lu-short/common/com_model"
 	"lu-short/component"
+	"lu-short/module/model"
 	"testing"
+	"time"
 )
 
 func TestAutoNewLuShortDao(t *testing.T) {
@@ -12,6 +17,17 @@ func TestAutoNewLuShortDao(t *testing.T) {
 	dig.MustProvide(NewLuShortDao)
 
 	dig.MustInvoke(func(dao *LuShortDao) {
-		dao.dao.Ping()
+		err := dao.CreateLuShort(context.Background(), &model.TbRedirect{
+			TbCommon:       com_model.TbCommon{},
+			CustomerId:     "1",
+			OriUrl:         "2",
+			Key:            "3",
+			RateLimit:      4,
+			TimesLimitLeft: 5,
+			JumpLimitLeft:  6,
+			BeginTime:      time.Now(),
+			EndTime:        time.Now(),
+		})
+		require.Nil(t, err)
 	})
 }

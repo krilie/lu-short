@@ -2,8 +2,10 @@ package dao
 
 import (
 	"context"
+	_ "embed"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/bluele/gcache"
+	"lu-short/common/utils/id_util"
 	"lu-short/component/ndb"
 	"lu-short/component/nlog"
 	"lu-short/module/model"
@@ -78,10 +80,16 @@ func (dao *LuShortDao) DeleteLuShort(ctx context.Context, id string) error {
 	return err
 }
 
-//func (dao *LuShortDao)CreateLuShort(ctx context.Context,m *model.TbRedirect) error {
-//	if m.Id == "" {
-//		m.Id = id_util.GetUuid()
-//	}
-//	//language=SQL
-//	var sql = "insert into tb_redirect(id, created_at, updated_at, deleted_at, customer_id, ori_url, `key`, rate_limit, times_limit_left, jump_limit_left, begin_time, end_time) VALUES ()"
-//}
+//go:embed dao_lu_short_create.sql
+var createSql string
+
+func (dao *LuShortDao) CreateLuShort(ctx context.Context, m *model.TbRedirect) error {
+	if m.Id == "" {
+		m.Id = id_util.GetUuid()
+	}
+	_, err := dao.dao.Exec(ctx, createSql,
+		m.Id, time.Now(), time.Now(), nil,
+		m.CustomerId, m.OriUrl, m.Key, m.RateLimit,
+		m.TimesLimitLeft, m.JumpLimitLeft, m.BeginTime, m.EndTime)
+	return err
+}

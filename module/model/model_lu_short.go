@@ -14,7 +14,7 @@ type TbRedirect struct {
 	TimesLimitLeft     int       `json:"times_limit_left" json:"times_limit_left"` // 总访问次数限制
 	JumpLimitLeft      int       `json:"jump_limit_left" json:"jump_limit_left"`   // 跳转次数限制
 	BeginTime          time.Time `json:"begin_time" json:"begin_time"`             // 有效开始时间
-	DeadTime           time.Time `json:"dead_time" json:"dead_time"`               // 有效时间
+	EndTime            time.Time `json:"end_time" json:"end_time"`                 // 有效时间
 }
 
 type TbRedirectLog struct {
