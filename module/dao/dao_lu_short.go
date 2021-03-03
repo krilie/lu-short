@@ -77,3 +77,11 @@ func (dao *LuShortDao) DeleteLuShort(ctx context.Context, id string) error {
 	}
 	return err
 }
+
+//func (dao *LuShortDao)CreateLuShort(ctx context.Context,m *model.TbRedirect) error {
+//	if m.Id == "" {
+//		m.Id = id_util.GetUuid()
+//	}
+//	//language=SQL
+//	var sql = "insert into tb_redirect(id, created_at, updated_at, deleted_at, customer_id, ori_url, `key`, rate_limit, times_limit_left, jump_limit_left, begin_time, end_time) VALUES ()"
+//}
