@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/go-gorp/gorp/v3"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
 	"lu-short/component/dbmigrate"
 	"lu-short/component/ncfg"
 	"strings"
@@ -15,26 +15,7 @@ import (
 
 // IDb interface that wrap of db operation
 type IDb interface {
-	sqlx.ExtContext
-	sqlx.Ext
-}
-
-// MustToSqlxTx convert IDb to *sqlx.Tx if not will panic
-func MustToSqlxTx(db IDb) *sqlx.Tx {
-	tx, ok := db.(*sqlx.Tx)
-	if !ok {
-		panic(errors.New("db is not a *sqlx.tx"))
-	}
-	return tx
-}
-
-// MustToSqlxDb convert IDb to *sqlx.DB if not will panic
-func MustToSqlxDb(db IDb) *sqlx.DB {
-	tx, ok := db.(*sqlx.DB)
-	if !ok {
-		panic(errors.New("db is not a *sqlx.tx"))
-	}
-	return tx
+	gorp.SqlExecutor
 }
 
 // NDb struct wrap of sql db config and start close
@@ -47,7 +28,7 @@ type NDb struct {
 	}
 	onceStartDb sync.Once
 	onceStopDb  sync.Once
-	sqlxDb      IDb // *sqlx.DB
+	sqlxDb      IDb // gorp.SqlExecutor
 }
 
 func NewNDb(cfg *ncfg.NConfig) *NDb {
@@ -64,7 +45,7 @@ func NewNDb(cfg *ncfg.NConfig) *NDb {
 }
 
 func (ndb *NDb) Ping() error {
-	return ndb.sqlxDb.(*sqlx.DB).Ping()
+	return ndb.sqlxDb.(*gorp.DbMap).Db.Ping()
 }
 
 func (ndb *NDb) Start() {
@@ -73,7 +54,7 @@ func (ndb *NDb) Start() {
 		// 数据库迁移
 		ndb.MigrationDb()
 
-		db, err := sqlx.Connect("mysql", ndb.cfg.ConnStr)
+		db, err := sql.Open("mysql", ndb.cfg.ConnStr)
 		if err != nil {
 			panic(err)
 		}
@@ -85,13 +66,13 @@ func (ndb *NDb) Start() {
 		if err != nil {
 			panic(err)
 		}
-		ndb.sqlxDb = db
+		ndb.sqlxDb = &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{}}
 	})
 }
 
 func (ndb *NDb) CloseDb() {
 	ndb.onceStopDb.Do(func() {
-		err := ndb.sqlxDb.(*sqlx.DB).Close()
+		err := ndb.sqlxDb.(*gorp.DbMap).Db.Close()
 		if err != nil {
 			panic(err)
 		}
@@ -109,7 +90,7 @@ func (ndb *NDb) GetDb(ctx context.Context) IDb {
 }
 
 func (ndb *NDb) Exec(ctx context.Context, sql string, args ...interface{}) (rowsAffected int64, err error) {
-	execContext, err := ndb.GetDb(ctx).ExecContext(ctx, sql, args...)
+	execContext, err := ndb.GetDb(ctx).WithContext(ctx).Exec(sql, args...)
 	if err != nil {
 		return 0, err
 	}
@@ -117,11 +98,12 @@ func (ndb *NDb) Exec(ctx context.Context, sql string, args ...interface{}) (rows
 }
 
 func (ndb *NDb) Get(ctx context.Context, data interface{}, sql string, args ...interface{}) error {
-	return sqlx.Get(ndb.GetDb(ctx), data, sql, args...)
+	return ndb.GetDb(ctx).SelectOne(data, sql, args...)
 }
 
 func (ndb *NDb) Select(ctx context.Context, data interface{}, sql string, args ...interface{}) error {
-	return sqlx.Select(ndb.GetDb(ctx), data, sql, args...)
+	_, err := ndb.GetDb(ctx).Select(data, sql, args...)
+	return err
 }
 
 // GetGlobalDb get db before use
@@ -139,7 +121,10 @@ func WithTrans(ctx context.Context, trans func(ctx context.Context) error, onNew
 	// 执行新事务
 	var doTransOnNewSession = func() error {
 		// 准备环境
-		newTransDb := MustToSqlxDb(globalDb).MustBeginTx(ctx, nil)    // 新的事务对象
+		newTransDb, err := globalDb.(*gorp.DbMap).Begin() // 新的事务对象
+		if err != nil {
+			return errors.New("begin tx err " + err.Error())
+		}
 		newTransCtx := ForceNewDbValuesCtx(ctx, globalDb, newTransDb) // 新的上下文 覆盖旧的上下文
 		// panic or err 回滚
 		panicked := true
