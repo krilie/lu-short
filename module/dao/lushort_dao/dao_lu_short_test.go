@@ -29,6 +29,9 @@ func TestAutoNewLuShortDao(t *testing.T) {
 		get, err := dao.dao.GetDb(context.Background()).Get(&model.TbRedirect{}, redirect.Id)
 		require.Nil(t, err)
 		assert.Equal(t, redirect.Key, get.(*model.TbRedirect).Key)
+		i, err := dao.dao.GetDb(context.Background()).Delete(redirect)
+		assert.EqualValues(t, i, 1)
+		assert.Nil(t, err)
 	})
 }
 
