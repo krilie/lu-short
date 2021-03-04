@@ -1,4 +1,4 @@
-package dao
+package manage_dao
 
 import (
 	"context"

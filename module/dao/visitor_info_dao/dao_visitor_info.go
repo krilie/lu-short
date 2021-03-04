@@ -1,4 +1,4 @@
-package dao
+package visitor_info_dao
 
 import (
 	"lu-short/component/ndb"
