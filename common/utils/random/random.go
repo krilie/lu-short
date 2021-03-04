@@ -24,8 +24,12 @@ func GetRandomStr(length int) string {
 	return GetRandomStrWithCharset(length, charset)
 }
 
-func GetRandomInt() int64 {
+func GetRandomInt64() int64 {
 	return rand.Int63()
+}
+
+func GetRandomInt32() int32 {
+	return rand.Int31()
 }
 
 func GetRandomIntStr() string {

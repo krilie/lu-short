@@ -3,10 +3,10 @@ package random
 import "testing"
 
 func TestRandomStrWithCharset(t *testing.T) {
-	println(GetRandomInt())
-	println(GetRandomInt())
-	println(GetRandomInt())
-	println(GetRandomInt())
+	println(GetRandomInt64())
+	println(GetRandomInt64())
+	println(GetRandomInt64())
+	println(GetRandomInt64())
 	println(GetRandomStr(1))
 	println(GetRandomStr(3))
 	println(GetRandomStr(9))

@@ -3,7 +3,6 @@ package lushort_dao
 import (
 	"context"
 	_ "embed"
-	sq "github.com/Masterminds/squirrel"
 	"github.com/bluele/gcache"
 	"lu-short/common/utils/id_util"
 	"lu-short/component/ndb"
@@ -50,23 +49,7 @@ func (dao *LuShortDao) GetReDirectById(ctx context.Context, id interface{}) (m *
 
 func (dao *LuShortDao) UpdateReDirect(ctx context.Context, m *model.TbRedirect) error {
 
-	sql, args, err := sq.Update("tb_redirect").
-		Where("id=?", m.Id).Where("deleted_at is null").
-		Set("updated_at=?", time.Now()).
-		Set("customer_id=?", m.Id).
-		Set("ori_url=?", m.Id).
-		Set("key=?", m.Id).
-		Set("rate_limit=?", m.Id).
-		Set("times_limit_left=?", m.Id).
-		Set("jump_limit_left=?", m.Id).
-		Set("begin_time=?", m.Id).
-		Set("dead_time=?", m.Id).
-		ToSql()
-	if err != nil {
-		panic(err)
-	}
-
-	affected, err := dao.dao.Exec(ctx, sql, args...)
+	affected, err := dao.dao.GetDb(ctx).Update(m)
 	if err != nil && affected > 0 {
 		return err
 	}
