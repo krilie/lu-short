@@ -1,4 +1,4 @@
-package dao
+package customer_dao
 
 import (
 	"lu-short/component/ndb"
