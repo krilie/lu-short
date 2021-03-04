@@ -20,7 +20,7 @@ func NewHttpApi(httpOpenApi *HttpOpenApi) *HttpApi {
 func (api *HttpApi) SetRouterAndStartHttpService(ctx context.Context, port int) func(waitDuration time.Duration) error {
 	rootRouter := gin.Default()
 
-	rootRouter.GET("/", api.HttpOpenApi.Redirect)
+	rootRouter.GET("/:key", api.HttpOpenApi.Redirect)
 
 	// 开始服务
 	srv := &http.Server{
