@@ -18,7 +18,12 @@ func TestAutoNewLuShortDao(t *testing.T) {
 
 	dig.MustInvoke(func(dao *LuShortDao) {
 		err := dao.CreateLuShort(context.Background(), &model.TbRedirect{
-			TbCommon:       com_model.TbCommon{},
+			TbCommon: com_model.TbCommon{
+				Id:        "",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+				DeletedAt: nil,
+			},
 			CustomerId:     "1",
 			OriUrl:         "2",
 			Key:            "3",

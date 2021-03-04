@@ -31,6 +31,10 @@ type NDb struct {
 	sqlxDb      IDb // gorp.SqlExecutor
 }
 
+func (n *NDb) AddTable(iTable interface{}, name string) *gorp.TableMap {
+	return n.sqlxDb.(*gorp.DbMap).AddTableWithName(iTable, name)
+}
+
 func NewNDb(cfg *ncfg.NConfig) *NDb {
 
 	dbCfg := cfg.GetDbCfg()

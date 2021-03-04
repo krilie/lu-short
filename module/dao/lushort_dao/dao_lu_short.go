@@ -31,6 +31,10 @@ func NewLuShortDao(dao *ndb.NDb, log *nlog.NLog) *LuShortDao {
 		}).
 		Build()
 
+	// 设置表名
+	luShortDao.dao.AddTable(model.TbRedirect{}, "tb_redirect").SetKeys(false, "id")
+	luShortDao.dao.AddTable(model.TbRedirectLog{}, "tb_redirect_log").SetKeys(false, "id")
+
 	return luShortDao
 }
 
@@ -80,16 +84,9 @@ func (dao *LuShortDao) DeleteLuShort(ctx context.Context, id string) error {
 	return err
 }
 
-//go:embed dao_lu_short_create.sql
-var createSql string
-
 func (dao *LuShortDao) CreateLuShort(ctx context.Context, m *model.TbRedirect) error {
 	if m.Id == "" {
 		m.Id = id_util.GetUuid()
 	}
-	_, err := dao.dao.Exec(ctx, createSql,
-		m.Id, time.Now(), time.Now(), nil,
-		m.CustomerId, m.OriUrl, m.Key, m.RateLimit,
-		m.TimesLimitLeft, m.JumpLimitLeft, m.BeginTime, m.EndTime)
-	return err
+	return dao.dao.GetDb(ctx).Insert(m)
 }
