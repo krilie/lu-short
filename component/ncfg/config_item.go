@@ -59,3 +59,8 @@ type AliSms struct {
 	Key    string `mapstructure:"key" json:"key" toml:"key"`
 	Secret string `mapstructure:"secret" json:"secret" toml:"secret"`
 }
+
+type Redis struct {
+	Auth    string `mapstructure:"auth" json:"auth" toml:"auth"`
+	ConnStr string `mapstructure:"conn_str" json:"conn_str" toml:"conn_str"`
+}
