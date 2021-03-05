@@ -37,12 +37,14 @@ func NewLuShortDao(dao *ndb.NDb, log *nlog.NLog) *LuShortDao {
 	return luShortDao
 }
 
-func (dao *LuShortDao) getReDirectById(ctx context.Context, id interface{}) (model *model.TbRedirect, err error) {
-	err = dao.dao.Get(ctx, model, "select * from tb_redirect where deleted_at is null and `id`=?", id)
-	return model, err
+func (dao *LuShortDao) getReDirectById(ctx context.Context, id interface{}) (m *model.TbRedirect, err error) {
+	m = &model.TbRedirect{}
+	err = dao.dao.Get(ctx, m, "select * from tb_redirect where deleted_at is null and `id`=?", id)
+	return m, err
 }
 
 func (dao *LuShortDao) getReDirectByKey(ctx context.Context, key interface{}) (m *model.TbRedirect, err error) {
+	m = &model.TbRedirect{}
 	err = dao.dao.GetDb(ctx).SelectOne(m, "select * from tb_redirect where deleted_at is null and `key`=?", key)
 	return m, err
 }
@@ -52,8 +54,12 @@ func (dao *LuShortDao) GetReDirectById(ctx context.Context, id interface{}) (m *
 }
 
 func (dao *LuShortDao) GetReDirectByKey(ctx context.Context, key interface{}) (m *model.TbRedirect, err error) {
+	m = &model.TbRedirect{}
 	redirect, err := dao.directCatchByKey.Get(key)
-	return redirect.(*model.TbRedirect), err
+	if err != nil {
+		return nil, err
+	}
+	return redirect.(*model.TbRedirect), nil
 }
 
 func (dao *LuShortDao) UpdateReDirect(ctx context.Context, m *model.TbRedirect) error {
