@@ -23,7 +23,7 @@ type Http struct {
 // Log 日志相关配置
 type Log struct {
 	LogFile  string `mapstructure:"log_file" json:"log_file" toml:"log_file"`    // 配置文件 空为控制台
-	LogLevel uint32 `mapstructure:"log_level" json:"log_level" toml:"log_level"` // 0-6 fatal ... trace
+	LogLevel string `mapstructure:"log_level" json:"log_level" toml:"log_level"` // 0-6 fatal ... trace
 }
 
 // DB 数据库相关配置
