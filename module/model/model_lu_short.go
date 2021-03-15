@@ -10,9 +10,9 @@ type TbRedirect struct {
 	CustomerId     string    `json:"customer_id" db:"customer_id"`
 	OriUrl         string    `json:"ori_url" db:"ori_url"`
 	Key            string    `json:"key" db:"key"`
-	RateLimit      int32     `json:"rate_limit" db:"rate_limit"`             // 每秒访问次数
-	TimesLimitLeft int32     `json:"times_limit_left" db:"times_limit_left"` // 总访问次数限制
-	JumpLimitLeft  int32     `json:"jump_limit_left" db:"jump_limit_left"`   // 跳转次数限制
+	RateLimit      int64     `json:"rate_limit" db:"rate_limit"`             // 每秒访问次数
+	TimesLimitLeft int64     `json:"times_limit_left" db:"times_limit_left"` // 总访问次数限制
+	JumpLimitLeft  int64     `json:"jump_limit_left" db:"jump_limit_left"`   // 跳转次数限制
 	BeginTime      time.Time `json:"begin_time" db:"begin_time"`             // 有效开始时间
 	EndTime        time.Time `json:"end_time" db:"end_time"`                 // 有效时间
 }
