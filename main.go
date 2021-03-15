@@ -4,6 +4,7 @@ import (
 	"context"
 	"lu-short/common/appdig"
 	"lu-short/component"
+	"lu-short/component/nlog"
 	"lu-short/module/dao"
 	"lu-short/module/service"
 	"lu-short/server"
@@ -28,13 +29,15 @@ func main() {
 	dig.MustProvide(httpapi.NewHttpApi)
 	dig.MustProvide(server.NewService)
 
-	dig.MustInvoke(func(svc *server.Service) {
+	dig.MustInvoke(func(svc *server.Service, log *nlog.NLog) {
 		var ctx = context.Background()
 		closeSvc := svc.StartService(ctx)
 		WaitSignalAndExit(ctx, func() {
 			err := closeSvc(time.Second * 10)
 			if err != nil {
-				println("err exit " + err.Error())
+				log.Get(ctx).Sugar().Errorf("err exit %v", err.Error())
+			} else {
+				log.Get(ctx).Info("exit no err")
 			}
 		})
 	})
