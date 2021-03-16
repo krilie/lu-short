@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"github.com/bluele/gcache"
 	"github.com/juju/ratelimit"
 	"lu-short/common/errs"
@@ -48,7 +49,7 @@ func (s *LuShortService) Redirect(ctx context.Context, key, customerId, ip, agen
 	// 短域名 =>限速 限次 限个数 .. 限ip(段) 禁id(多个) 禁ip(段)
 	var loadLimitInfo = func(key string) *LimitInfo {
 		load, err := s.Limit.Get(key)
-		if err != nil {
+		if err != nil && !errors.Is(err, gcache.KeyNotFoundError) {
 			panic(err)
 		}
 		if load == nil {

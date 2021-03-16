@@ -2,7 +2,9 @@ package lushort_dao
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
+	"errors"
 	"lu-short/common/utils/id_util"
 	"lu-short/component/ndb"
 	"lu-short/component/nlog"
@@ -37,6 +39,9 @@ func (dao *LuShortDao) GetReDirectById(ctx context.Context, id interface{}) (m *
 func (dao *LuShortDao) GetReDirectByKey(ctx context.Context, key interface{}) (m *model.TbRedirect, err error) {
 	m = &model.TbRedirect{}
 	err = dao.dao.GetDb(ctx).SelectOne(m, "select * from tb_redirect where deleted_at is null and `key`=?", key)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
 	return m, err
 }
 

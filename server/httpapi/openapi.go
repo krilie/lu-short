@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	_ "embed"
 	"lu-short/common/utils/id_util"
 	"lu-short/module/service"
 	"lu-short/server/httpapi/ginutil"
@@ -15,11 +16,18 @@ func NewHttpOpenApi(openApiSvc *service.UnionSvcOpenApi) *HttpOpenApi {
 	return &HttpOpenApi{OpenApiSvc: openApiSvc}
 }
 
+//go:embed favicon.png
+var icon []byte
+
 // https://t.we.com/eRexvjLkE :key
 func (openApi *HttpOpenApi) Redirect(c *gin.Context) {
 	key := c.Param("key")
 	if key == "" {
 		c.String(404, "no page find here")
+		return
+	}
+	if key == "favicon.ico" {
+		_, _ = c.Writer.Write(icon)
 		return
 	}
 	// customerId customerId
