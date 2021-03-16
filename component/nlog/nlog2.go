@@ -8,6 +8,8 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"lu-short/common/run_env"
+	"lu-short/component/ncfg"
+	"os"
 )
 
 type NLog struct {
@@ -34,24 +36,32 @@ func (n *NLog) Close() {
 	}
 }
 
-func NewNLog() *NLog {
-	logFile := &lumberjack.Logger{
-		Filename:   fmt.Sprintf("log/log-%s.log", run_env.GetHostName()), //filePath
-		MaxSize:    100,                                                  // megabytes
-		MaxBackups: 7,
-		MaxAge:     30,    //days
-		Compress:   false, // disabled by default
+func NewNLog(cfg *ncfg.NConfig) *NLog {
+	var logFile io.WriteCloser
+	if cfg.GetLogCfg().LogFile == "stdout" {
+		logFile = os.Stdout
+	} else {
+		logFile = &lumberjack.Logger{
+			Filename:   fmt.Sprintf("log/log-%s.log", run_env.GetHostName()), //filePath
+			MaxSize:    100,                                                  // megabytes
+			MaxBackups: 7,
+			MaxAge:     30,    //days
+			Compress:   false, // disabled by default
+		}
+	}
+	var level zapcore.Level
+	err := level.UnmarshalText([]byte(cfg.GetLogCfg().LogLevel)) //日志等级
+	if err != nil {
+		panic(err)
 	}
 
 	enConfig := zap.NewProductionEncoderConfig() //生成配置
-
 	// 时间格式
 	enConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(enConfig), //编码器配置
 		zapcore.AddSync(logFile),         //打印到控制台和文件
-		zap.InfoLevel,                    //日志等级
+		level,                            //日志等级
 	)
 
 	log := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))

@@ -3,8 +3,6 @@ package lushort_dao
 import (
 	"context"
 	_ "embed"
-	sq "github.com/Masterminds/squirrel"
-	"github.com/bluele/gcache"
 	"lu-short/common/utils/id_util"
 	"lu-short/component/ndb"
 	"lu-short/component/nlog"
@@ -13,83 +11,53 @@ import (
 )
 
 type LuShortDao struct {
-	dao         *ndb.NDb
-	log         *nlog.NLog
-	directCatch gcache.Cache
+	dao *ndb.NDb
+	log *nlog.NLog
 }
 
 func NewLuShortDao(dao *ndb.NDb, log *nlog.NLog) *LuShortDao {
 	var luShortDao = &LuShortDao{
-		dao:         dao,
-		log:         log,
-		directCatch: nil,
+		dao: dao,
+		log: log,
 	}
 
-	luShortDao.directCatch = gcache.New(200).
-		LoaderFunc(func(key interface{}) (interface{}, error) {
-			return luShortDao.getReDirectById(context.Background(), key)
-		}).
-		Build()
+	// 设置表名
+	luShortDao.dao.AddTable(model.TbRedirect{}, "tb_redirect").SetKeys(false, "id")
+	luShortDao.dao.AddTable(model.TbRedirectLog{}, "tb_redirect_log").SetKeys(false, "id")
 
 	return luShortDao
 }
 
-func (dao *LuShortDao) getReDirectById(ctx context.Context, id interface{}) (model *model.TbRedirect, err error) {
-	err = dao.dao.Get(ctx, model, "", id)
-	return model, err
+func (dao *LuShortDao) GetReDirectById(ctx context.Context, id interface{}) (m *model.TbRedirect, err error) {
+	m = &model.TbRedirect{}
+	err = dao.dao.Get(ctx, m, "select * from tb_redirect where deleted_at is null and `id`=?", id)
+	return m, err
 }
 
-func (dao *LuShortDao) GetReDirectById(ctx context.Context, id interface{}) (m *model.TbRedirect, err error) {
-	redirect, err := dao.directCatch.Get(id)
-	return redirect.(*model.TbRedirect), err
+func (dao *LuShortDao) GetReDirectByKey(ctx context.Context, key interface{}) (m *model.TbRedirect, err error) {
+	m = &model.TbRedirect{}
+	err = dao.dao.GetDb(ctx).SelectOne(m, "select * from tb_redirect where deleted_at is null and `key`=?", key)
+	return m, err
 }
 
 func (dao *LuShortDao) UpdateReDirect(ctx context.Context, m *model.TbRedirect) error {
 
-	sql, args, err := sq.Update("tb_redirect").
-		Where("id=?", m.Id).Where("deleted_at is null").
-		Set("updated_at=?", time.Now()).
-		Set("customer_id=?", m.Id).
-		Set("ori_url=?", m.Id).
-		Set("key=?", m.Id).
-		Set("rate_limit=?", m.Id).
-		Set("times_limit_left=?", m.Id).
-		Set("jump_limit_left=?", m.Id).
-		Set("begin_time=?", m.Id).
-		Set("dead_time=?", m.Id).
-		ToSql()
-	if err != nil {
-		panic(err)
-	}
-
-	affected, err := dao.dao.Exec(ctx, sql, args...)
+	affected, err := dao.dao.GetDb(ctx).Update(m)
 	if err != nil && affected > 0 {
 		return err
 	}
 
-	dao.directCatch.Remove(m.Id)
-
 	return nil
 }
 
-func (dao *LuShortDao) DeleteLuShort(ctx context.Context, id string) error {
-	_, err := dao.dao.Exec(ctx, "update table tb_redirect set deleted_at=? where id=?", time.Now(), id)
-	if err == nil {
-		dao.directCatch.Remove(id)
-	}
+func (dao *LuShortDao) DeleteLuShort(ctx context.Context, id, key string) error {
+	_, err := dao.dao.Exec(ctx, "update tb_redirect set deleted_at=? where id=? and `key`=?", time.Now(), id, key)
 	return err
 }
-
-//go:embed dao_lu_short_create.sql
-var createSql string
 
 func (dao *LuShortDao) CreateLuShort(ctx context.Context, m *model.TbRedirect) error {
 	if m.Id == "" {
 		m.Id = id_util.GetUuid()
 	}
-	_, err := dao.dao.Exec(ctx, createSql,
-		m.Id, time.Now(), time.Now(), nil,
-		m.CustomerId, m.OriUrl, m.Key, m.RateLimit,
-		m.TimesLimitLeft, m.JumpLimitLeft, m.BeginTime, m.EndTime)
-	return err
+	return dao.dao.GetDb(ctx).Insert(m)
 }

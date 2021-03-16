@@ -22,6 +22,12 @@ func (cfg *NConfig) GetAliSmsCfg() *AliSms {
 	return cfgItem
 }
 
+func (cfg *NConfig) GetRedisCfg() *Redis {
+	var cfgItem = &Redis{}
+	cfg.GetConfigItem("redis", cfgItem)
+	return cfgItem
+}
+
 func (cfg *NConfig) GetFileSaveCfg() *FileSave {
 	var cfgItem = &FileSave{}
 	cfg.GetConfigItem("file_save", cfgItem)
