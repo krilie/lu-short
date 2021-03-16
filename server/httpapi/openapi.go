@@ -1,9 +1,9 @@
 package httpapi
 
 import (
-	"context"
 	"lu-short/common/utils/id_util"
 	"lu-short/module/service"
+	"lu-short/server/httpapi/ginutil"
 )
 import "github.com/gin-gonic/gin"
 
@@ -22,17 +22,29 @@ func (openApi *HttpOpenApi) Redirect(c *gin.Context) {
 		c.String(404, "no page find here")
 		return
 	}
-	redirect, err := openApi.OpenApiSvc.LuShortService.Dao.GetReDirectByKey(context.WithValue(context.Background(), "ginCtx", c), key)
+	// customerId customerId
+	customerId, err := c.Cookie("cId")
 	if err != nil {
-		c.String(404, "some err here")
+		customerId = id_util.GetUuid()
+		c.SetCookie("id", customerId, 6000000, "/", "", true, true)
+	}
+	// customerId customerId
+	deviceId, err := c.Cookie("dId")
+	if err != nil {
+		deviceId = id_util.GetUuid()
+		c.SetCookie("id", deviceId, 6000000, "/", "", true, true)
+	}
+	// remote ip devices
+	ip := c.ClientIP()
+	// agent
+	agent := c.Request.UserAgent()
+	// 跳转
+	ginWrap := ginutil.NewGinWrap(c, openApi.OpenApiSvc.LuShortService.Log)
+	oriUrl, err := openApi.OpenApiSvc.LuShortService.Redirect(ginWrap.GetAppContext(), key, customerId, ip, agent, deviceId)
+	if err != nil {
+		ginWrap.ReturnWithErr(err)
 		return
 	}
-	cookie, err := c.Cookie("id")
-	if err != nil {
-		cookie = id_util.GetUuid()
-		c.SetCookie("id", cookie, 6000000, "/", "", true, true)
-	}
-	println(cookie)
-	c.Redirect(302, redirect.OriUrl)
+	c.Redirect(302, oriUrl)
 	return
 }
